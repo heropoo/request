@@ -3,6 +3,7 @@
 namespace Moon\Request;
 
 use Swoole\Http\Request as SwooleHttpRequest;
+use Moon\Routing\Route;
 
 class Request
 {
@@ -11,6 +12,9 @@ class Request
 
     /** @var Session $session */
     protected $session;
+
+    /** @var Route $route */
+    protected $route;
 
     public $header;
 
@@ -146,6 +150,18 @@ class Request
     {
         $session->start();
         $this->session = $session;
+    }
+
+    public function setRoute(Route $route)
+    {
+        $this->route = $route;
+    }
+
+    /**
+     * @return Route
+     */
+    public function getRoute(){
+        return $this->route;
     }
 
     public function getRawContent()

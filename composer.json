@@ -13,5 +13,8 @@
         "psr-4": {
             "Moon\\Request\\": "./"
         }
+    },
+    "suggest": {
+        "heropoo/routing": "To match request quickly"
     }
 }
