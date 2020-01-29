@@ -4,6 +4,7 @@ namespace Moon\Request;
 
 use Swoole\Http\Request as SwooleHttpRequest;
 use Moon\Routing\Route;
+use Moon\Session\Session;
 
 class Request
 {
@@ -30,7 +31,7 @@ class Request
 
     //public $tmpFiles;
 
-    protected $baseUri = '';
+    protected $basePath = '';
 
     private function __construct()
     {
@@ -104,8 +105,8 @@ class Request
             return $this->server['PATH_INFO'];
         }
         $uri = parse_url($this->server['REQUEST_URI'], PHP_URL_PATH);
-        $this->baseUri = dirname($this->server['SCRIPT_NAME']);
-        $path = substr($uri, -(strlen($uri) - strlen($this->baseUri)));
+        $this->basePath = dirname($this->server['SCRIPT_NAME']);
+        $path = substr($uri, -(strlen($uri) - strlen($this->basePath)));
         return str_replace('//', '/', '/' . $path);
     }
 
@@ -160,7 +161,8 @@ class Request
     /**
      * @return Route
      */
-    public function getRoute(){
+    public function getRoute()
+    {
         return $this->route;
     }
 
@@ -172,8 +174,8 @@ class Request
         return file_get_contents('php://input');
     }
 
-    public function getBaseUri()
+    public function getBasePath()
     {
-        return $this->baseUri;
+        return $this->basePath;
     }
 }
