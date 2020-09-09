@@ -2,12 +2,11 @@
 
 namespace Moon\Request;
 
+use Swoole\Http\Request as SwooleHttpRequest;
 use Moon\Routing\Route;
 use Moon\Session\Session;
-use Psr\Http\Message\RequestInterface;
-use Psr\Http\Message\UriInterface;
 
-class Request extends Message implements RequestInterface
+class RequestTest
 {
     /** @var SwooleHttpRequest */
     protected $swooleHttpRequest;
@@ -54,6 +53,38 @@ class Request extends Message implements RequestInterface
             }
         }
         return $request;
+    }
+
+    public static function createFromSwooleHttpRequest(SwooleHttpRequest $swooleHttpRequest)
+    {
+        $request = new static();
+        $request->swooleHttpRequest = $swooleHttpRequest;
+
+        $request->cookie = $swooleHttpRequest->cookie;
+        $request->files = $swooleHttpRequest->files;
+        $request->tmpFiles = $swooleHttpRequest->tmpfiles;
+        $request->get = $swooleHttpRequest->get ?? [];
+        $request->post = $swooleHttpRequest->post ?? [];
+
+        $request->header = $swooleHttpRequest->header;
+        if (isset($swooleHttpRequest->header['authorization']) && $tmp = base64_decode(substr($swooleHttpRequest->header['authorization'], 6))) {
+            $request->server['PHP_AUTH_USER'] = strstr($tmp, ':', true);
+            $request->server['PHP_AUTH_PW'] = substr(strstr($tmp, ':'), 1);
+        }
+
+        foreach ($swooleHttpRequest->server as $key => $value) {
+            $request->server[strtoupper($key)] = $value;
+        }
+
+        return $request;
+    }
+
+    /**
+     * @return SwooleHttpRequest
+     */
+    public function getSwooleHttpRequest()
+    {
+        return $this->swooleHttpRequest;
     }
 
     /**
@@ -136,6 +167,9 @@ class Request extends Message implements RequestInterface
 
     public function getRawContent()
     {
+        if ($this->swooleHttpRequest instanceof SwooleHttpRequest) {
+            return $this->swooleHttpRequest->rawContent();
+        }
         return file_get_contents('php://input');
     }
 
@@ -143,31 +177,4 @@ class Request extends Message implements RequestInterface
     {
         return $this->basePath;
     }
-
-    public function getRequestTarget()
-    {
-        // TODO: Implement getRequestTarget() method.
-    }
-
-    public function withRequestTarget($requestTarget)
-    {
-        // TODO: Implement withRequestTarget() method.
-    }
-
-    public function withMethod($method)
-    {
-        // TODO: Implement withMethod() method.
-    }
-
-    public function getUri()
-    {
-        // TODO: Implement getUri() method.
-    }
-
-    public function withUri(UriInterface $uri, $preserveHost = false)
-    {
-        // TODO: Implement withUri() method.
-    }
-
-
 }
