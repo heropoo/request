@@ -101,7 +101,7 @@ class Request
      */
     public function getPathInfo()
     {
-        if (isset($this->server['PATH_INFO'])) {
+        if (!empty($this->server['PATH_INFO'])) {
             return $this->server['PATH_INFO'];
         }
         $uri = parse_url($this->server['REQUEST_URI'], PHP_URL_PATH);
